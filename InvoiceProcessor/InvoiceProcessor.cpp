@@ -23,173 +23,6 @@ map<int, map<string, strVector>> lineHeaders;
 map<int, string> headerOfInvoice;
 vector<vector<int>> headerBoundary;
 
-void InitializeLineHeader()
-{
-	lineHeaders[0]["quantity"] = { "QUANTITY" };
-	lineHeaders[1]["description"] = { "DESCRIPTION" };
-	lineHeaders[2]["lineAmount"] = { "AMOUNT" };
-	lineHeaders[3]["unitPrice"] = { "PRICE" };
-	lineHeaders[4]["lineNumber"] = { "PO LINE NUMBER" };
-	lineHeaders[5]["vat"] = { "VAT" };
-}
-
-void IdentifyHeaderBoundary()
-{
-	bool flag = true;
-	vector<int> boundary;
-
-	for (auto temp : headerOfInvoice)
-	{
-		if (flag == false)
-		{
-			boundary.push_back(temp.first);
-			flag = true;
-		}
-		else
-		{
-			boundary.push_back(temp.first - 1);
-			headerBoundary.push_back(boundary);
-			boundary.clear();
-			boundary.push_back(temp.first);
-		}
-		boundary.push_back(64000);
-		headerBoundary.push_back(boundary);
-	}
-}
-
-void OptimalHeaderMatching(map<int, map<int, string>> &result)
-{
-
-}
-
-bool MatchLineHeaders(map<int, string> line)
-{
-	int noOfSpace = 0;
-	int noOfMatchedHeaders = 0;
-	bool headerMatch = false;
-
-	string headerStringFromResult = "";
-
-	for (int i = 0; i < lineHeaders.size(); i++)
-	{
-		for (auto headerType : lineHeaders[i])
-		{
-			for (int pos = 0; pos < headerType.second.size(); pos++)
-			{
-				noOfSpace = 0;
-				for (int i = 0; i < headerType.second[pos].size(); i++)
-				{
-					if (headerType.second[pos].at(i) == ' ')
-					{
-						noOfSpace++;
-					}
-				}
-				auto tokens = line.begin();
-				for (; tokens != line.end();)
-				{
-					headerStringFromResult = tokens->second;
-					if (noOfSpace > 0)
-					{
-						auto tempItr = tokens;
-						for (int i = noOfSpace; i != 0; i--)
-						{
-							tempItr++;
-							if (tempItr != line.end())
-							{
-								headerStringFromResult = headerStringFromResult + " " + tempItr->second;
-							}
-							else
-								break;
-						}
-					}
-					if (StringCompare(headerType.second[pos], headerStringFromResult))
-					{
-						noOfMatchedHeaders++;
-						headerOfInvoice[tokens->first] = headerType.first;
-						headerMatch = true;
-						break;
-					}
-					tokens++;
-				}
-				if (headerMatch)
-				{
-					headerMatch = false;
-					break;
-				}
-			}
-		}
-	}
-	if (noOfMatchedHeaders >= 2)
-		return true;
-	else
-		return false;
-}
-
-bool FindLineHeaderValues(map<int, string> line, map<string, string> &headedrValues)
-{
-	auto headerItr = headerOfInvoice.begin();
-	auto lineItr = line.begin();
-	for (int i = 0; lineItr != line.end() && headerItr != headerOfInvoice.end() && i < headerBoundary.size();)
-	{
-		if (lineItr->first >= headerBoundary[i][0] - 5 && lineItr->first < headerBoundary[i][i])
-		{
-			if (headedrValues.find(headerItr->second) == headedrValues.end())
-				headedrValues[headerItr->second] = lineItr->second;
-			else
-				headedrValues[headerItr->second] = headedrValues[headerItr->second] + " " + lineItr->second;
-		}
-		else
-		{
-			i++;
-			headerItr++;
-			if (lineItr != line.begin())
-				lineItr--;
-		}
-		lineItr++;
-	}
-	if (headedrValues.size() == headerOfInvoice.size())
-		return true;
-	else
-		return false;
-}
-
-void IdentifyLineItemHeader(map<int, map<int, string>> result)
-{
-	bool next = false;
-	bool down = false;
-	int x, y;
-	vector<string> res;
-	string headerStringFromResult = "";
-	bool lineHeaderMatched = false;
-	map<string, string> headerValues;
-	vector<map<string, string>> lineItemValus;
-
-	for (auto &row : result)
-	{
-		if (MatchLineHeaders(row.second) && !lineHeaderMatched)
-		{
-			IdentifyHeaderBoundary();
-			lineHeaderMatched = true;
-		}
-		else if (lineHeaderMatched)
-		{
-			if (FindLineHeaderValues(row.second, headerValues))
-			{
-				lineItemValus.push_back(headerValues);
-				headerValues.clear();
-			}
-			else
-				break;
-		}
-	}
-	for (auto lineItem : lineItemValus)
-	{
-		for (auto val : lineItem)
-		{
-			std::cout << val.first << ":" << val.second << ";";
-		}
-	}
-}
 
 void Refine(map<int, map<int, string>> &result)
 {
@@ -237,7 +70,6 @@ bool SearchDate(string str)
 	catch (regex_error e)
 	{
 		cout << e.what();
-		_getch();
 		return false;
 	}
 }
@@ -402,10 +234,9 @@ int main(int argc, char* argv[])
 			catch (const std::exception ex)
 			{
 				cout << ex.what(); 
-				_getch();
 				return 0;
 			}
 		}
 	}
-	return _getch();
+	return 0;
 }
