@@ -7,23 +7,6 @@
 #include "utility.h"
 #include "GenerateTrainingModel.h"
 
-typedef vector<string> strVector;
-typedef map<string, vector<int>> templateFeature;
-
-struct lineItemDetails
-{
-	int lineNumber;
-	int quality;
-	string description;
-	float unitAmount;
-	float totalLineAmunt;
-};
-
-map<int, map<string, strVector>> lineHeaders;
-map<int, string> headerOfInvoice;
-vector<vector<int>> headerBoundary;
-
-
 void Refine(map<int, map<int, string>> &result)
 {
 	regex exp1("[A-Za-z]+0[A-Za-z]+", regex_constants::ECMAScript | regex_constants::icase);
