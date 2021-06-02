@@ -1,5 +1,6 @@
 # OpenCv
 Project intends to showcase implementation of machine learning to exatract text from images.Here, OCR is developed using opencv in c++ and process the result to extract retrieve fields from invoice. Here, we have used SVM algorithm to predict text.
+
 Note: This is only for reference and does not folow industry standards of coding.
 
 # How To Use Program
